@@ -24,8 +24,8 @@
         var row1 = {'URL':'http://store.company.com/dir2/other.html', 'Outcome':'同源', 'Reason':''};
         var row2 = {'URL':'http://store.company.com/dir/inner/another.html', 'Outcome':'同源', 'Reason':''};
         var row3 = {'URL':'https://store.company.com/secure.html', 'Outcome':'不同源', 'Reason':'協定不同'};
-        var row4 = {'URL':'http://store.company.com:81/dir/etc.html', 'Outcome':'同源', 'Reason':'埠號不同'};
-        var row5 = {'URL':'http://news.company.com/dir/other.html', 'Outcome':'同源', 'Reason':'主機位置不同'};
+        var row4 = {'URL':'http://store.company.com:81/dir/etc.html', 'Outcome':'不同源', 'Reason':'埠號不同'};
+        var row5 = {'URL':'http://news.company.com/dir/other.html', 'Outcome':'不同源', 'Reason':'主機位置不同'};
         
         console.table([row1, row2, row3, row4, row5,]);
     })();
