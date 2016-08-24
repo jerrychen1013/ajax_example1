@@ -9,15 +9,28 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 </head>
 <body>
-    <input type="button" value="Click" onclick="runJSONP()">
+    <input type="button" value="JSON" onclick="runJSON()">
     <p></p>
-    <input type="button" value="onClick" onclick="runJSON()">
+    <input type="button" value="runJQueryJSONP" onclick="runAjax()">
+    <p></p>
+    <input type="button" value="runRawJSONP" onclick="runJSONP()">
+    <p></p>
+    <input type="button" value="AjaxCrossDomainParameter" onclick="jsonpCross()">
+    <p></p>
+    <input type="button" value="Xss" onclick="jsonpXss()">
 </body>
 <script>
-    $(function() {
-        runAjax();
-    });
+    (function() {
+        var row1 = {'URL':'http://store.company.com/dir2/other.html', 'Outcome':'同源', 'Reason':''};
+        var row2 = {'URL':'http://store.company.com/dir/inner/another.html', 'Outcome':'同源', 'Reason':''};
+        var row3 = {'URL':'https://store.company.com/secure.html', 'Outcome':'不同源', 'Reason':'協定不同'};
+        var row4 = {'URL':'http://store.company.com:81/dir/etc.html', 'Outcome':'同源', 'Reason':'埠號不同'};
+        var row5 = {'URL':'http://news.company.com/dir/other.html', 'Outcome':'同源', 'Reason':'主機位置不同'};
+        
+        console.table([row1, row2, row3, row4, row5,]);
+    })();
 
+    // 使用jQuery ajax api做到跨domain
     function runAjax() {
         $.ajax({
             url: 'http://localhost:8002/index.php',
@@ -31,13 +44,29 @@
         });
     }
 
-    // 此為錯誤示範，因為網址生成時，外面看不到handle
-    // 除非建立全域 var handle ;
-    var handle;
-    function runJSONP() {
-        handle = function(jsonp) {
+    // 使用jQuery ajax api做到跨domain，參數使用crossDomain, 免去打jsonp & jsonCallback參數
+    function jsonpCross()
+    {
+        $.ajax(
+        {
+            url: 'http://localhost:8002/index.php',
+            dataType: 'jsonp',
+            crossDomain: true
+        })
+        .done(function(data)
+        {
+            console.log(data) ;
+        }) ;
+    }
+
+
+
+    // 原生javascript做到跨domain
+    // 要建立全域 var handle，否則runJSONP()內看不到handle ;
+    var handle = function(jsonp) {
             console.log(jsonp);
         };
+    function runJSONP() {
 
         var url = "http://localhost:8002/index.php?callback=handle";
 
@@ -48,6 +77,8 @@
         document.getElementsByTagName('head')[0].appendChild(script);
     }
 
+
+    //同源JSON資料取得，若server開啟header('access-control-allow-origin:*'); 則允許跨domain
     function runJSON() {
         $.ajax({
             url: 'http://localhost:8002/index.php',
@@ -57,6 +88,23 @@
                 console.log(json);
             }
         });
+    }
+
+
+
+    function jsonpXss()
+    {
+        $.ajax(
+        {
+            url: 'http://localhost:8002/xss.php',
+            dataType: 'jsonp',
+            jsonp: 'callback',
+            jsonpCallback: 'handler'
+        })
+        .done(function(data)
+        {
+            console.log(data) ;
+        }) ;
     }
 
 </script>
